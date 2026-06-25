@@ -1,0 +1,32 @@
+name: .NET WPF Build CI
+
+on:
+  push:
+    branches: [ "main", "master", "poe", "part3" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: windows-latest   # WPF requires a Windows runner to build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore NuGet packages
+        run: dotnet restore CybersecurityBotGUI.csproj
+
+      - name: Build (Release)
+        run: dotnet build CybersecurityBotGUI.csproj --configuration Release --no-restore
+
+      - name: Upload build artefacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: CybersecurityBotGUI-Release
+          path: bin/Release/net8.0-windows/
